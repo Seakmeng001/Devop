@@ -1,0 +1,33 @@
+pipeline {
+    agent any // window agent, Jenkins-laravel (other machine)
+
+    stages {
+        stage('Fetch from GitHub') { //build steps
+            steps {
+                echo 'Fetching for GitHub'
+                git branch: 'tp2', url: 'https://github.com/Seakmeng001/Devop.git'
+            }
+        }
+        stage('Build using Tools'){
+            steps{
+                echo 'Compiling code ...'
+                sh 'cp .env.example .env'
+                sh 'composer install && php artisan key:generate && npm install && npm run build'
+            }
+        }
+        stage('Test the app'){
+            steps{
+                echo 'Testing unit tests...'
+                echo 'Testing feature...'
+                sh 'php artisan test'
+            }
+        }
+        stage('Email Notification!') {
+            steps{
+                mail bcc: '', body: '''Hello welcome to Jenkins email alerts
+                Thanks!''', cc: '', from: '', replyTo: '', subject: 'Jenkins Job', to: 'sandbox.smtp.mailtrap.io'
+            }
+        }
+    }
+    
+}
